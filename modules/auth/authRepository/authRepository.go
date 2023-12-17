@@ -3,7 +3,7 @@ package authrepository
 import (
 	"context"
 	"errors"
-	"fmt"
+	"strings"
 
 	"github.com/TGRZiminiar/Clean-Architecture-Go/modules/auth"
 	"github.com/google/uuid"
@@ -41,13 +41,16 @@ func (r *authRepository) CreateUser(pctx context.Context, user *auth.CreateUser)
 	if err := r.db.QueryRowxContext(pctx, query, user.Username, user.Email, user.Password).Scan(&auth.Id); err != nil {
 		// r.db.MustBegin().Tx.Rollback()
 		// return nil, fmt.Errorf("insert user failed: %v", err.Error())
+		if strings.Contains(err.Error(), "duplicate") {
+			return nil, errors.New("insert user by id failed cause of duplicate data")
+		}
 		return nil, errors.New("insert user repo failed")
 	}
-	fmt.Println(auth.Id)
 	return &auth.Id, nil
 }
 
 func (r *authRepository) FindUserById(pctx context.Context, userId *uuid.UUID) (*auth.User, error) {
+
 	query := `
 	SELECT 
 		"id",

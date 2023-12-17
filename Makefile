@@ -2,7 +2,7 @@
 
 # Start Pg
 pg:
-	docker run --name authDB \
+	docker run --name authDB \	
 		-e POSTGRES_PASSWORD=secret \
 		-e POSTGRES_USER=root \
 		-e POSTGRES_DB=test \
@@ -17,6 +17,9 @@ stoppg:
 init-db:
 	migrate -path pkg/database/migrations \
 		-database postgres://mix:secret@localhost:5432/test?sslmode=disable up
+drop-db:
+	migrate -path pkg/database/migrations \
+		-database postgres://mix:secret@localhost:5432/test?sslmode=disable down
 
 # Init migrate
 # Sample: make init-mg name=create

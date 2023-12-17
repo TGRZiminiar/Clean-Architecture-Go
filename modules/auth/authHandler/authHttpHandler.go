@@ -33,6 +33,7 @@ func NewAuthHttpHandler(cfg *config.Config, authUsecase authusecase.AuthUsecaseS
 }
 
 func (h *authHttpHandler) CreateUser(c *fiber.Ctx) error {
+
 	ctx := context.Background()
 
 	wrapper := request.NewContextWrapper(c)
@@ -62,5 +63,4 @@ func (h *authHttpHandler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	return response.SuccessRes(c, 201, user)
-
 }

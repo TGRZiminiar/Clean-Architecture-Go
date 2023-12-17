@@ -26,6 +26,8 @@ type (
 		AccessSecretKey  string
 		RefreshSecretKey string
 		ApiSecretKey     string
+		PrivateKeyPath   string
+		PublicKeyPath    string
 		AccessDuration   int64
 		RefreshDuration  int64
 		ApiDuration      int64
@@ -56,6 +58,8 @@ func LoadConfig(path string) Config {
 			AccessSecretKey:  os.Getenv("JWT_ACCESS_SECRET_KEY"),
 			RefreshSecretKey: os.Getenv("JWT_REFRESH_SECRET_KEY"),
 			ApiSecretKey:     os.Getenv("JWT_API_SECRET_KEY"),
+			PrivateKeyPath:   os.Getenv("PrivateKeyPath"),
+			PublicKeyPath:    os.Getenv("PublicKeyPath"),
 
 			AccessDuration: func() int64 {
 				result, err := strconv.ParseInt(os.Getenv("JWT_ACCESS_DURATION"), 10, 64)

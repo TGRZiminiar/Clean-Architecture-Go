@@ -38,11 +38,15 @@ func (u *authUsecase) CreateUser(cfg *config.Config, pctx context.Context, req *
 		return nil, err
 	}
 
-	accessToken := jwtauth.NewAccessToken(cfg.Jwt.AccessSecretKey, cfg.Jwt.AccessDuration, &jwtauth.Claims{
+	accessToken, err := jwtauth.NewAccessToken(cfg.Jwt.AccessDuration, &jwtauth.Claims{
 		UserId:   userData.Id,
 		Email:    userData.Email,
 		Username: userData.Username,
 	}).SignToken()
+
+	if err != nil {
+		return nil, err
+	}
 
 	fmt.Println(accessToken)
 
