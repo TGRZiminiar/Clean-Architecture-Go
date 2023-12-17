@@ -10,7 +10,8 @@ import (
 
 func DbConnect(cfg *config.Config) *sqlx.DB {
 	// Connect
-	db, err := sqlx.Connect("pgx", cfg.Db.Url)
+	// host=%s port=%d user=%s password=%s dbname=%s sslmode=%s
+	db, err := sqlx.Connect("pgx", "host=127.0.0.1 port=5432 user=mix dbname=test password=secret sslmode=disable")
 	if err != nil {
 		log.Fatalf("connect to db failed: %v\n", err)
 	}

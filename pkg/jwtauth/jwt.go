@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -17,8 +18,9 @@ type (
 	}
 
 	Claims struct {
-		PlayerId string `json:"player_id"`
-		RoleCode int    `json:"role_code"`
+		UserId   uuid.UUID `json:"userId"`
+		Email    string    `json:"email"`
+		Username string    `json:"username"`
 	}
 
 	AuthMapClaims struct {

@@ -5,13 +5,14 @@ services:
     container_name: testContainer
     image: postgres:alpine
     ports:
-      - 5435:5432
+      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
+      - POSTGRES_DB=test
       - POSTGRES_PASSWORD=secret
       - POSTGRES_USER=mix
-
+      - POSTGRES_PORT=5432
 
 volumes:
   postgres_data:

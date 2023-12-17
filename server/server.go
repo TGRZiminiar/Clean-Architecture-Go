@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -56,7 +57,7 @@ func Start(pctx context.Context, cfg *config.Config, db *sqlx.DB) {
 		cfg: cfg,
 		app: fiber.New(fiber.Config{
 			AppName:      "test",
-			BodyLimit:    10,
+			BodyLimit:    10 * 1024 * 1024,
 			ReadTimeout:  10 * time.Second,
 			WriteTimeout: 20 * time.Second,
 			JSONEncoder:  json.Marshal,
@@ -67,10 +68,12 @@ func Start(pctx context.Context, cfg *config.Config, db *sqlx.DB) {
 	jwtauth.SetApiKey(cfg.Jwt.ApiSecretKey)
 
 	// Body Limit
+	// app.Settings.MaxRequestBodySize = 10 * 1024 * 1024 // 10 MB
 
 	switch s.cfg.App.Name {
-	// case "auth":
-	// 	s.authService()
+	case "auth":
+		fmt.Println("hello")
+		s.authService()
 	}
 
 	// Graceful Shutdown

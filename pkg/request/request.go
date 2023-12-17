@@ -1,21 +1,26 @@
 package request
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 type (
 	contextWrapperService interface {
-		Bind(data any) error
+		Validate(data interface{}) []ErrorResponse
+		ParseJson(data interface{}) error
 	}
 
 	contextWrapper struct {
 		Context   *fiber.Ctx
 		validator *validator.Validate
+	}
+
+	ErrorResponse struct {
+		Error       bool
+		FailedField string
+		Tag         string
+		Value       interface{}
 	}
 )
 
@@ -25,22 +30,31 @@ func NewContextWrapper(ctx *fiber.Ctx) contextWrapperService {
 		validator: validator.New(),
 	}
 }
-func (c *contextWrapper) Bind(data interface{}) error {
 
-	dataMap, ok := data.(fiber.Map)
-	if !ok {
-		return fmt.Errorf("error: data must be of type fiber.Map")
+func (c *contextWrapper) ParseJson(data interface{}) error {
+	if err := c.Context.BodyParser(&data); err != nil {
+		return err
 	}
-
-	if err := c.Context.Bind(dataMap); err != nil {
-		log.Printf("Error: Bind data failed: %s", err.Error())
-		return fmt.Errorf("error: bind data failed: %s", err.Error())
-	}
-
-	if err := c.validator.Struct(data); err != nil {
-		log.Printf("Error: Validate data failed: %s", err.Error())
-		return fmt.Errorf("error: validate data failed: %s", err.Error())
-	}
-
 	return nil
+}
+
+func (c *contextWrapper) Validate(data interface{}) []ErrorResponse {
+	validationErrors := []ErrorResponse{}
+
+	errs := c.validator.Struct(data)
+	if errs != nil {
+		for _, err := range errs.(validator.ValidationErrors) {
+			// In this case data object is actually holding the User struct
+			var elem ErrorResponse
+
+			elem.FailedField = err.Field() // Export struct field name
+			elem.Tag = err.Tag()           // Export struct tag
+			elem.Value = err.Value()       // Export field value
+			elem.Error = true
+
+			validationErrors = append(validationErrors, elem)
+		}
+	}
+
+	return validationErrors
 }

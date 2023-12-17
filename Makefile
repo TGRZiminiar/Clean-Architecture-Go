@@ -14,15 +14,15 @@ stoppg:
 	docker stop authDB && docker rm authDB
 
 # Init table
-init-table:
+init-db:
 	migrate -path pkg/database/migrations \
-		-database postgres://root:secret@localhost:5432/test?sslmode=disable up
+		-database postgres://mix:secret@localhost:5432/test?sslmode=disable up
 
 # Init migrate
 # Sample: make init-mg name=create
 # Complete Command: migrate create -ext sql -dir pkg/database/migrations -seq init_schema2
 create-mg:
 	migrate create -ext sql -dir pkg/database/migrations -seq $(name)
-	
 
-	
+u:
+	go run main.go ./env/dev/.env.dev
