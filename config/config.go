@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -26,8 +25,8 @@ type (
 		AccessSecretKey  string
 		RefreshSecretKey string
 		ApiSecretKey     string
-		PrivateKeyPath   string
-		PublicKeyPath    string
+		PrivateKeyPem    string
+		PublicKeyPem     string
 		AccessDuration   int64
 		RefreshDuration  int64
 		ApiDuration      int64
@@ -39,9 +38,8 @@ type (
 )
 
 func LoadConfig(path string) Config {
-	fmt.Println(path)
 	if err := godotenv.Load(path); err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("Error loading .env file : %s", err.Error())
 	}
 
 	return Config{
@@ -58,8 +56,8 @@ func LoadConfig(path string) Config {
 			AccessSecretKey:  os.Getenv("JWT_ACCESS_SECRET_KEY"),
 			RefreshSecretKey: os.Getenv("JWT_REFRESH_SECRET_KEY"),
 			ApiSecretKey:     os.Getenv("JWT_API_SECRET_KEY"),
-			PrivateKeyPath:   os.Getenv("PrivateKeyPath"),
-			PublicKeyPath:    os.Getenv("PublicKeyPath"),
+			PrivateKeyPem:    os.Getenv("PrivateKeyPem"),
+			PublicKeyPem:     os.Getenv("PublicKeyPem"),
 
 			AccessDuration: func() int64 {
 				result, err := strconv.ParseInt(os.Getenv("JWT_ACCESS_DURATION"), 10, 64)

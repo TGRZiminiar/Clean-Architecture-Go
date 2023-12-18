@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/TGRZiminiar/Clean-Architecture-Go/config"
 	"github.com/TGRZiminiar/Clean-Architecture-Go/modules/auth"
@@ -57,10 +58,27 @@ func (h *authHttpHandler) CreateUser(c *fiber.Ctx) error {
 		return response.ErrorRes(c, http.StatusBadRequest, strings.Join(errMsgs, " and "))
 	}
 
-	user, err := h.authUsecase.CreateUser(h.cfg, ctx, req)
+	token, user, err := h.authUsecase.CreateUser(h.cfg, ctx, req)
 	if err != nil {
 		return response.ErrorRes(c, http.StatusBadRequest, err.Error())
 	}
+
+	oneWeek := time.Now().Add(7 * 24 * time.Hour)
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "accessToken",
+		Value:    token,
+		HTTPOnly: true,
+		Secure:   true,
+		Expires:  oneWeek,
+	})
+	c.Cookie(&fiber.Cookie{
+		Name:     "accessChecker",
+		Value:    user.Id.String(),
+		HTTPOnly: false,
+		Secure:   false,
+		Expires:  oneWeek,
+	})
 
 	return response.SuccessRes(c, 201, user)
 }

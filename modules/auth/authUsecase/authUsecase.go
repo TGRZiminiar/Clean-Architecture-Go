@@ -2,7 +2,6 @@ package authusecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/TGRZiminiar/Clean-Architecture-Go/config"
 	"github.com/TGRZiminiar/Clean-Architecture-Go/modules/auth"
@@ -12,7 +11,7 @@ import (
 
 type (
 	AuthUsecaseService interface {
-		CreateUser(cfg *config.Config, pctx context.Context, req *auth.CreateUser) (*auth.UserJson, error)
+		CreateUser(cfg *config.Config, pctx context.Context, req *auth.CreateUser) (string, *auth.UserJson, error)
 	}
 
 	authUsecase struct {
@@ -26,36 +25,40 @@ func NewAuthUsecase(authRepo authrepository.AuthRepositoryService) AuthUsecaseSe
 	}
 }
 
-func (u *authUsecase) CreateUser(cfg *config.Config, pctx context.Context, req *auth.CreateUser) (*auth.UserJson, error) {
+func (u *authUsecase) CreateUser(cfg *config.Config, pctx context.Context, req *auth.CreateUser) (string, *auth.UserJson, error) {
 
 	userId, err := u.authRepo.CreateUser(pctx, req)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	userData, err := u.authRepo.FindUserById(pctx, userId)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	accessToken, err := jwtauth.NewAccessToken(cfg.Jwt.AccessDuration, &jwtauth.Claims{
-		UserId:   userData.Id,
-		Email:    userData.Email,
-		Username: userData.Username,
-	}).SignToken()
-
+	accessToken, err := jwtauth.NewAccessToken(
+		&cfg.Jwt,
+		&jwtauth.Claims{
+			UserId:   userData.Id,
+			Email:    userData.Email,
+			Username: userData.Username,
+		}, cfg.Jwt.AccessDuration, "accessToken").SignToken()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	fmt.Println(accessToken)
+	// parse, _ := jwtauth.ParseToken(accessToken, &cfg.Jwt)
+	// fmt.Println(parse)
 
-	return &auth.UserJson{
-		Id:        userData.Id,
-		Username:  userData.Username,
-		Email:     userData.Email,
-		Image:     userData.Image,
-		CreatedAt: userData.CreatedAt,
-		UpdatedAt: userData.UpdatedAt,
-	}, nil
+	return accessToken,
+		&auth.UserJson{
+			Id:        userData.Id,
+			Username:  userData.Username,
+			Email:     userData.Email,
+			Image:     userData.Image,
+			UpdatedAt: userData.UpdatedAt,
+			CreatedAt: userData.CreatedAt,
+		}, nil
+
 }

@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/TGRZiminiar/Clean-Architecture-Go/config"
-	"github.com/TGRZiminiar/Clean-Architecture-Go/pkg/jwtauth"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 )
@@ -64,8 +63,6 @@ func Start(pctx context.Context, cfg *config.Config, db *sqlx.DB) {
 			JSONDecoder:  json.Unmarshal,
 		}),
 	}
-
-	jwtauth.SetApiKey(cfg.Jwt.ApiSecretKey)
 
 	// Body Limit
 	// app.Settings.MaxRequestBodySize = 10 * 1024 * 1024 // 10 MB
