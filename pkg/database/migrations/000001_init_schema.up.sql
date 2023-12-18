@@ -18,6 +18,7 @@ $$ LANGUAGE 'plpgsql';
 -- Create the users table
 CREATE TABLE users (
     id UUID DEFAULT uuid_generate_v4() NOT NULL UNIQUE PRIMARY KEY,
+    image VARCHAR NOT NULL,
     username VARCHAR UNIQUE NOT NULL,
     password VARCHAR NOT NULL,
     email VARCHAR UNIQUE NOT NULL,
